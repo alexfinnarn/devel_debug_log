@@ -1,0 +1,4 @@
+name = Debug Page
+description = Creates a page that shows debug messages.
+package = Development
+core = 7.x

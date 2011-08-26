@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Debug Page module install/schema hooks.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function dbp_schema() {
+  $schema = array();
+
+  $schema['dbp_messages'] = array(
+    'description' => 'Table for storing debug messages.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'The message identifier.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'timestamp' => array(
+        'description' => 'The Unix timestamp when the message was saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'message' => array(
+        'description' => 'The debug message.',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_disable().
+ */
+function dbp_disable() {
+  // Empty debug table when the module is disabled.
+  db_delete('dbp_messages')
+    ->execute();
+}

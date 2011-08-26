@@ -1,0 +1,138 @@
+<?php
+
+/**
+ * @file
+ * Creates a page that shows debug messages.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function dbp_menu() {
+  $items['admin/reports/debug'] = array(
+    'title' => 'Debug messages',
+    'description' => 'View debug messages.',
+    'page callback' => 'dbp_page',
+    'access arguments' => array('access site reports'),
+  );
+  $items['dbp/callback'] = array(
+    'title' => 'Debug messages callback',
+    'page callback' => 'dbp_callback',
+    'access arguments' => array('access site reports'),
+  );
+
+  return $items;
+}
+
+/**
+ * Saves a debug message.
+ *
+ * @param $message
+ *   A debug message to save, which can be:
+ *   - string: saved as is.
+ *   - object or array: dumbed using print_r, and saved as text.
+ */
+function dbp($message) {
+  if (is_array($message) || is_object($message)) {
+    $message = print_r($message, TRUE);
+  }
+
+  $query = db_insert('dbp_messages')->fields(array('timestamp', 'message'));
+  $query->values(array(
+    'timestamp' => REQUEST_TIME,
+    'message' => $message,
+  ));
+  $query->execute();
+}
+
+/**
+ * Displays the debug messages table.
+ */
+function dbp_page() {
+  drupal_add_js(drupal_get_path('module', 'dbp') . '/dbp.js');
+
+  $table_page = array(
+    'messages_table' => dbp_get_messages_table(),
+  );
+
+  return $table_page;
+}
+
+/**
+ * Menu callback; Retrieve a JSON object containing data for the debug messages page.
+ */
+function dbp_callback() {
+  $data = array(
+    'content' => drupal_render(dbp_get_messages_table()),
+  );
+
+  drupal_json_output($data);
+}
+
+/**
+ * Helper function to return the debug messages table.
+ *
+ * @return
+ *   A render array containing the table.
+ */
+function dbp_get_messages_table() {
+  $results = db_select('dbp_messages', 'm')
+    ->limit(10)
+    ->fields('m', array('timestamp', 'message'))
+    ->orderBy('timestamp', 'desc')
+    ->execute();
+
+  $rows = array();
+  foreach ($results as $result) {
+    $rows[] = array(
+      format_date($result->timestamp, 'short'),
+    );
+    $rows[] = array(
+      theme('debug_message', array('message' => check_plain($result->message))),
+    );
+  }
+
+  if (count($rows) == 0) {
+    $content = array(
+      'messages' => array(
+        '#markup' => t('No messages.'),
+        '#prefix' => '<div id="dbp-messages-table">',
+        '#suffix' => '</div>',
+      )
+    );
+  }
+  else {
+    $content = array(
+      'messages' => array(
+        '#theme' => 'table',
+        '#rows' => $rows,
+        '#prefix' => '<div id="dbp-messages-table">',
+        '#suffix' => '</div>',
+      )
+    );
+  }
+
+  return $content;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function dbp_theme() {
+  return array(
+    'debug_message' => array(
+      'variables' => array('message' => ''),
+    ),
+  );
+}
+
+/**
+ * Returns HTML for a debug message.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - message: The rendered message.
+ */
+function theme_debug_message($variables) {
+  return '<pre>' . $variables['message'] . '</pre>';
+}
