@@ -15,6 +15,7 @@ Drupal.dbp.refresh = function() {
     dataType: 'json',
     success: function(data) {
       $('#dbp-messages-table').html(data['content']);
+      $('#dbp-pager').html(data['pager']);
     },
   });
   

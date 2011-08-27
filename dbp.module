@@ -49,10 +49,16 @@ function dbp($message) {
  * Displays the debug messages table.
  */
 function dbp_page() {
-  drupal_add_js(drupal_get_path('module', 'dbp') . '/dbp.js');
+  // Add auto-refresh javascript on the first page only.
+  if (!isset($_GET['page'])) {
+    drupal_add_js(drupal_get_path('module', 'dbp') . '/dbp.js');
+  }
 
   $table_page = array(
     'messages_table' => dbp_get_messages_table(),
+    'pager' => array(
+      '#theme' => 'pager',
+    ),
   );
 
   return $table_page;
@@ -77,6 +83,7 @@ function dbp_callback() {
  */
 function dbp_get_messages_table() {
   $results = db_select('dbp_messages', 'm')
+    ->extend('PagerDefault')
     ->limit(10)
     ->fields('m', array('timestamp', 'message'))
     ->orderBy('timestamp', 'desc')
