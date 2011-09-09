@@ -77,7 +77,7 @@ function dbp_once($message) {
  * Displays the debug messages table.
  */
 function dbp_page() {
-// Add auto-refresh javascript on the first page only.
+  // Add auto-refresh javascript on the first page only.
   if (!isset($_GET['page'])) {
     drupal_add_js(drupal_get_path('module', 'dbp') . '/dbp.js');
   }
