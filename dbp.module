@@ -46,10 +46,38 @@ function dbp($message) {
 }
 
 /**
+ * Checks if the message has already been saved during the current page request,
+ * and saves the message only if it is not a repetition of a previous one.
+ *
+ * @param $message
+ *   A debug message to save, which can be:
+ *   - string: saved as is.
+ *   - object or array: dumbed using print_r, and saved as text.
+ */
+function dbp_once($message) {
+  $message_history = &drupal_static(__FUNCTION__);
+
+  if (!isset($message_history)) {
+    $message_history = array();
+  }
+
+  $serialized = serialize($message);
+  $hash = md5($serialized);
+
+  if (in_array($hash, $message_history)) {
+    return;
+  }
+
+  $message_history[] = $hash;
+
+  dbp($message);
+}
+
+/**
  * Displays the debug messages table.
  */
 function dbp_page() {
-  // Add auto-refresh javascript on the first page only.
+// Add auto-refresh javascript on the first page only.
   if (!isset($_GET['page'])) {
     drupal_add_js(drupal_get_path('module', 'dbp') . '/dbp.js');
   }
