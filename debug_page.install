@@ -8,10 +8,10 @@
 /**
  * Implements hook_schema().
  */
-function dbp_schema() {
+function debug_page_schema() {
   $schema = array();
 
-  $schema['dbp_messages'] = array(
+  $schema['debug_page_messages'] = array(
     'description' => 'Table for storing debug messages.',
     'fields' => array(
       'id' => array(
@@ -41,8 +41,8 @@ function dbp_schema() {
 /**
  * Implements hook_disable().
  */
-function dbp_disable() {
+function debug_page_disable() {
   // Empty debug table when the module is disabled.
-  db_delete('dbp_messages')
+  db_delete('debug_page_messages')
     ->execute();
 }

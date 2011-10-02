@@ -8,16 +8,16 @@
 /**
  * Implements hook_menu().
  */
-function dbp_menu() {
+function debug_page_menu() {
   $items['admin/reports/debug'] = array(
     'title' => 'Debug messages',
     'description' => 'View debug messages.',
-    'page callback' => 'dbp_page',
+    'page callback' => 'debug_page_page',
     'access arguments' => array('access site reports'),
   );
-  $items['dbp/callback'] = array(
+  $items['debug-page/callback'] = array(
     'title' => 'Debug messages callback',
-    'page callback' => 'dbp_callback',
+    'page callback' => 'debug_page_callback',
     'access arguments' => array('access site reports'),
   );
 
@@ -37,7 +37,7 @@ function dbp($message) {
     $message = print_r($message, TRUE);
   }
 
-  $query = db_insert('dbp_messages')->fields(array('timestamp', 'message'));
+  $query = db_insert('debug_page_messages')->fields(array('timestamp', 'message'));
   $query->values(array(
     'timestamp' => REQUEST_TIME,
     'message' => $message,
@@ -76,14 +76,14 @@ function dbp_once($message) {
 /**
  * Displays the debug messages table.
  */
-function dbp_page() {
+function debug_page_page() {
   // Add auto-refresh javascript on the first page only.
   if (!isset($_GET['page'])) {
-    drupal_add_js(drupal_get_path('module', 'dbp') . '/dbp.js');
+    drupal_add_js(drupal_get_path('module', 'debug_page') . '/debug_page.js');
   }
 
   $table_page = array(
-    'messages_table' => dbp_get_messages_table(),
+    'messages_table' => debug_page_get_messages_table(),
     'pager' => array(
       '#theme' => 'pager',
     ),
@@ -95,9 +95,9 @@ function dbp_page() {
 /**
  * Menu callback; Retrieve a JSON object containing data for the debug messages page.
  */
-function dbp_callback() {
+function debug_page_callback() {
   $data = array(
-    'content' => drupal_render(dbp_get_messages_table()),
+    'content' => drupal_render(debug_page_get_messages_table()),
   );
 
   drupal_json_output($data);
@@ -109,8 +109,8 @@ function dbp_callback() {
  * @return
  *   A render array containing the table.
  */
-function dbp_get_messages_table() {
-  $results = db_select('dbp_messages', 'm')
+function debug_page_get_messages_table() {
+  $results = db_select('debug_page_messages', 'm')
     ->extend('PagerDefault')
     ->limit(10)
     ->fields('m', array('timestamp', 'message'))
@@ -131,7 +131,7 @@ function dbp_get_messages_table() {
     $content = array(
       'messages' => array(
         '#markup' => t('No messages.'),
-        '#prefix' => '<div id="dbp-messages-table">',
+        '#prefix' => '<div id="debug-page-messages-table">',
         '#suffix' => '</div>',
       )
     );
@@ -141,7 +141,7 @@ function dbp_get_messages_table() {
       'messages' => array(
         '#theme' => 'table',
         '#rows' => $rows,
-        '#prefix' => '<div id="dbp-messages-table">',
+        '#prefix' => '<div id="debug-page-messages-table">',
         '#suffix' => '</div>',
       )
     );
@@ -153,7 +153,7 @@ function dbp_get_messages_table() {
 /**
  * Implements hook_theme().
  */
-function dbp_theme() {
+function debug_page_theme() {
   return array(
     'debug_message' => array(
       'variables' => array('message' => ''),
