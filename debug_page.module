@@ -30,7 +30,7 @@ function debug_page_menu() {
  * @param $message
  *   A debug message to save, which can be:
  *   - string: saved as is.
- *   - object or array: dumbed using print_r, and saved as text.
+ *   - object or array: dumped using print_r, and saved as text.
  */
 function dbp($message) {
   if (is_array($message) || is_object($message)) {
@@ -52,7 +52,7 @@ function dbp($message) {
  * @param $message
  *   A debug message to save, which can be:
  *   - string: saved as is.
- *   - object or array: dumbed using print_r, and saved as text.
+ *   - object or array: dumped using print_r, and saved as text.
  */
 function dbp_once($message) {
   $message_history = &drupal_static(__FUNCTION__);
