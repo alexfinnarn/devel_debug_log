@@ -13,12 +13,12 @@ function debug_page_menu() {
     'title' => 'Debug messages',
     'description' => 'View debug messages.',
     'page callback' => 'debug_page_page',
-    'access arguments' => array('access site reports'),
+    'access arguments' => array('access devel information'),
   );
   $items['debug-page/callback'] = array(
     'title' => 'Debug messages callback',
     'page callback' => 'debug_page_callback',
-    'access arguments' => array('access site reports'),
+    'access arguments' => array('access devel information'),
   );
 
   return $items;
@@ -30,17 +30,23 @@ function debug_page_menu() {
  * @param $message
  *   A debug message to save, which can be:
  *   - string: saved as is.
- *   - object or array: dumped using print_r, and saved as text.
+ *   - object or array: saved serialized.
  */
-function dbp($message) {
+function dbp($message, $title = '') {  
   if (is_array($message) || is_object($message)) {
-    $message = print_r($message, TRUE);
+    $message = serialize($message);
+    $serialized = TRUE;
+  }
+  else {
+    $serialized = FALSE;
   }
 
-  $query = db_insert('debug_page_messages')->fields(array('timestamp', 'message'));
+  $query = db_insert('debug_page_messages')->fields(array('timestamp', 'title', 'message', 'serialized'));
   $query->values(array(
     'timestamp' => REQUEST_TIME,
+    'title' => $title,
     'message' => $message,
+    'serialized' => $serialized ? 1 : 0,
   ));
   $query->execute();
 }
@@ -52,9 +58,9 @@ function dbp($message) {
  * @param $message
  *   A debug message to save, which can be:
  *   - string: saved as is.
- *   - object or array: dumped using print_r, and saved as text.
+ *   - object or array: saved serialized.
  */
-function dbp_once($message) {
+function dbp_once($message, $title = '') {
   $message_history = &drupal_static(__FUNCTION__);
 
   if (!isset($message_history)) {
@@ -70,7 +76,7 @@ function dbp_once($message) {
 
   $message_history[] = $hash;
 
-  dbp($message);
+  dbp($message, $title);
 }
 
 /**
@@ -113,15 +119,24 @@ function debug_page_get_messages_table() {
   $results = db_select('debug_page_messages', 'm')
     ->extend('PagerDefault')
     ->limit(10)
-    ->fields('m', array('timestamp', 'message'))
-    ->orderBy('timestamp', 'desc')
+    ->fields('m', array('timestamp', 'title', 'message', 'serialized'))
+    ->orderBy('id', 'desc')
     ->execute();
 
   $rows = array();
   foreach ($results as $result) {
+    if ($result->serialized) {
+      $result->message = unserialize($result->message);
+    }
+
+    if (is_array($result->message) || is_object($result->message)) {
+      $result->message = print_r($result->message, TRUE);
+    }
+        
     $rows[] = array(
-      format_date($result->timestamp, 'short'),
+      theme('debug_message_header', array('title' => check_plain($result->title), 'time' => format_date($result->timestamp, 'short'))),
     );
+    
     $rows[] = array(
       theme('debug_message', array('message' => check_plain($result->message))),
     );
@@ -155,10 +170,35 @@ function debug_page_get_messages_table() {
  */
 function debug_page_theme() {
   return array(
+    'debug_message_header' => array(
+      'variables' => array(
+        'title' => '',
+        'time' => '',
+      ),
+    ),
     'debug_message' => array(
-      'variables' => array('message' => ''),
+      'variables' => array(
+        'message' => '',
+      ),
     ),
   );
+}
+
+/**
+ * Returns HTML for a debug message header.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - title: The title given to the message.
+ *   - time: The time of the message.
+ */
+function theme_debug_message_header($variables) {
+  $output = $variables['time'];
+
+  if (!empty($variables['title'])) {
+    $output = $variables['title'] . ' @ ' . $output;
+  }
+  return $output;
 }
 
 /**
