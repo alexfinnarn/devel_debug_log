@@ -129,16 +129,19 @@ function debug_page_get_messages_table() {
       $result->message = unserialize($result->message);
     }
 
-    if (is_array($result->message) || is_object($result->message)) {
-      $result->message = print_r($result->message, TRUE);
+    if (merits_krumo($result->message)) {
+      $result->message = krumo_ob($result->message);
     }
-        
+    else {
+      $result->message = check_plain($result->message);
+    }
+    
     $rows[] = array(
       theme('debug_message_header', array('title' => check_plain($result->title), 'time' => format_date($result->timestamp, 'short'))),
     );
     
     $rows[] = array(
-      theme('debug_message', array('message' => check_plain($result->message))),
+      theme('debug_message', array('message' => $result->message)),
     );
   }
 
@@ -209,5 +212,5 @@ function theme_debug_message_header($variables) {
  *   - message: The rendered message.
  */
 function theme_debug_message($variables) {
-  return '<pre>' . $variables['message'] . '</pre>';
+  return $variables['message'];
 }
