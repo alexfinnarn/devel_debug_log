@@ -32,7 +32,7 @@ function debug_page_menu() {
  *   - string: saved as is.
  *   - object or array: saved serialized.
  */
-function dbp($message, $title = '') {  
+function dbp($message, $title = '') {
   if (is_array($message) || is_object($message)) {
     $message = serialize($message);
     $serialized = TRUE;
@@ -135,11 +135,11 @@ function debug_page_get_messages_table() {
     else {
       $result->message = check_plain($result->message);
     }
-    
+
     $rows[] = array(
       theme('debug_message_header', array('title' => check_plain($result->title), 'time' => format_date($result->timestamp, 'short'))),
     );
-    
+
     $rows[] = array(
       theme('debug_message', array('message' => $result->message)),
     );
