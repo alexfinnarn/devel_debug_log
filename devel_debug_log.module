@@ -8,16 +8,16 @@
 /**
  * Implements hook_menu().
  */
-function debug_page_menu() {
+function devel_debug_log_menu() {
   $items['admin/reports/debug'] = array(
     'title' => 'Debug messages',
     'description' => 'View debug messages.',
-    'page callback' => 'debug_page_page',
+    'page callback' => 'devel_debug_log_page',
     'access arguments' => array('access devel information'),
   );
-  $items['debug-page/callback'] = array(
+  $items['devel-debug-log/callback'] = array(
     'title' => 'Debug messages callback',
-    'page callback' => 'debug_page_callback',
+    'page callback' => 'devel_debug_log_callback',
     'access arguments' => array('access devel information'),
   );
 
@@ -32,7 +32,7 @@ function debug_page_menu() {
  *   - string: saved as is.
  *   - object or array: saved serialized.
  */
-function dbp($message, $title = '') {
+function ddl($message, $title = '') {
   if (is_array($message) || is_object($message)) {
     $message = serialize($message);
     $serialized = TRUE;
@@ -41,7 +41,7 @@ function dbp($message, $title = '') {
     $serialized = FALSE;
   }
 
-  $query = db_insert('debug_page_messages')->fields(array('timestamp', 'title', 'message', 'serialized'));
+  $query = db_insert('devel_debug_log')->fields(array('timestamp', 'title', 'message', 'serialized'));
   $query->values(array(
     'timestamp' => REQUEST_TIME,
     'title' => $title,
@@ -60,7 +60,7 @@ function dbp($message, $title = '') {
  *   - string: saved as is.
  *   - object or array: saved serialized.
  */
-function dbp_once($message, $title = '') {
+function ddl_once($message, $title = '') {
   $message_history = &drupal_static(__FUNCTION__);
 
   if (!isset($message_history)) {
@@ -76,20 +76,20 @@ function dbp_once($message, $title = '') {
 
   $message_history[] = $hash;
 
-  dbp($message, $title);
+  ddl($message, $title);
 }
 
 /**
  * Displays the debug messages table.
  */
-function debug_page_page() {
+function devel_debug_log_page() {
   // Add auto-refresh javascript on the first page only.
   if (!isset($_GET['page'])) {
-    drupal_add_js(drupal_get_path('module', 'debug_page') . '/debug_page.js');
+    drupal_add_js(drupal_get_path('module', 'devel_debug_log') . '/devel_debug_log.js');
   }
 
   $table_page = array(
-    'messages_table' => debug_page_get_messages_table(),
+    'messages_table' => devel_debug_log_get_messages_table(),
     'pager' => array(
       '#theme' => 'pager',
     ),
@@ -101,9 +101,9 @@ function debug_page_page() {
 /**
  * Menu callback; Retrieve a JSON object containing data for the debug messages page.
  */
-function debug_page_callback() {
+function devel_debug_log_callback() {
   $data = array(
-    'content' => drupal_render(debug_page_get_messages_table()),
+    'content' => drupal_render(devel_debug_log_get_messages_table()),
   );
 
   drupal_json_output($data);
@@ -115,8 +115,8 @@ function debug_page_callback() {
  * @return
  *   A render array containing the table.
  */
-function debug_page_get_messages_table() {
-  $results = db_select('debug_page_messages', 'm')
+function devel_debug_log_get_messages_table() {
+  $results = db_select('devel_debug_log', 'm')
     ->extend('PagerDefault')
     ->limit(10)
     ->fields('m', array('timestamp', 'title', 'message', 'serialized'))
@@ -149,7 +149,7 @@ function debug_page_get_messages_table() {
     $content = array(
       'messages' => array(
         '#markup' => t('No messages.'),
-        '#prefix' => '<div id="debug-page-messages-table">',
+        '#prefix' => '<div id="devel-debug-log-messages-table">',
         '#suffix' => '</div>',
       )
     );
@@ -159,7 +159,7 @@ function debug_page_get_messages_table() {
       'messages' => array(
         '#theme' => 'table',
         '#rows' => $rows,
-        '#prefix' => '<div id="debug-page-messages-table">',
+        '#prefix' => '<div id="devel-debug-log-messages-table">',
         '#suffix' => '</div>',
       )
     );
@@ -171,7 +171,7 @@ function debug_page_get_messages_table() {
 /**
  * Implements hook_theme().
  */
-function debug_page_theme() {
+function devel_debug_log_theme() {
   return array(
     'debug_message_header' => array(
       'variables' => array(

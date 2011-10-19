@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Debug Page module install/schema hooks.
+ * Devel debug log module install/schema hooks.
  */
 
 /**
  * Implements hook_schema().
  */
-function debug_page_schema() {
+function devel_debug_log_schema() {
   $schema = array();
 
-  $schema['debug_page_messages'] = array(
+  $schema['devel_debug_log'] = array(
     'description' => 'Table for storing debug messages.',
     'fields' => array(
       'id' => array(
@@ -56,8 +56,8 @@ function debug_page_schema() {
 /**
  * Implements hook_disable().
  */
-function debug_page_disable() {
+function devel_debug_log_disable() {
   // Empty debug table when the module is disabled.
-  db_delete('debug_page_messages')
+  db_delete('devel_debug_log')
     ->execute();
 }
