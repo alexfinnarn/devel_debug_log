@@ -89,6 +89,7 @@ function devel_debug_log_page() {
   }
 
   $table_page = array(
+    'devel_debug_log_clear_log_form' => drupal_get_form('devel_debug_log_clear_log_form'),
     'messages_table' => devel_debug_log_get_messages_table(),
     'pager' => array(
       '#theme' => 'pager',
@@ -108,6 +109,38 @@ function devel_debug_log_callback() {
 
   drupal_json_output($data);
 }
+
+/**
+ * Return form for dblog clear button.
+ *
+ * @ingroup forms
+ * @see dblog_clear_log_submit()
+ */
+function devel_debug_log_clear_log_form($form) {
+  $form['devel_debug_log_clear'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Clear debug log messages'),
+    '#description' => t('This will permanently remove the log messages from the database.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['devel_debug_log_clear']['clear'] = array(
+    '#type' => 'submit',
+    '#value' => t('Clear log messages'),
+    '#submit' => array('devel_debug_log_clear_log_submit'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit callback: clear database with log messages.
+ */
+function devel_debug_log_clear_log_submit() {
+  db_delete('devel_debug_log')->execute();
+  drupal_set_message(t('Database debug log cleared.'));
+}
+
 
 /**
  * Helper function to return the debug messages table.
