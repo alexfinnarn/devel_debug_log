@@ -103,8 +103,9 @@ function devel_debug_log_page() {
  * Menu callback; Retrieve a JSON object containing data for the debug messages page.
  */
 function devel_debug_log_callback() {
+  $message_table = devel_debug_log_get_messages_table();
   $data = array(
-    'content' => drupal_render(devel_debug_log_get_messages_table()),
+    'content' => drupal_render($message_table),
   );
 
   drupal_json_output($data);
