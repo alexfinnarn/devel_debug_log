@@ -45,7 +45,7 @@ function ddl($message, $title = '') {
   $query->values(array(
     'timestamp' => REQUEST_TIME,
     'title' => $title,
-    'message' => $message,
+    'message' => isset($message) ? $message : 'NULL',
     'serialized' => $serialized ? 1 : 0,
   ));
   $query->execute();
