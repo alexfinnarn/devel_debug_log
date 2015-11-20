@@ -5,7 +5,7 @@ Drupal.devel_debug_log.active = 1;
 
 Drupal.behaviors.devel_debug_log = {
   attach: function (context) {
-    setTimeout("Drupal.devel_debug_log.refresh()", 5000);
+    setTimeout("Drupal.devel_debug_log.refresh()", 1000 * Drupal.settings.devel_debug_log.log_refresh_frequency);
     
     $('#devel-debug-log-messages-table').click(function () {
       Drupal.devel_debug_log.active = 0;
@@ -24,7 +24,7 @@ Drupal.devel_debug_log.refresh = function() {
       }
     });
   
-    setTimeout("Drupal.devel_debug_log.refresh()", 5000);
+    setTimeout("Drupal.devel_debug_log.refresh()", 1000 * Drupal.settings.devel_debug_log.log_refresh_frequency);
   }
 }
 
