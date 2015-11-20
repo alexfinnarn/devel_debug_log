@@ -19,6 +19,7 @@ Drupal.devel_debug_log.refresh = function() {
       url: '/devel-debug-log/callback',
       dataType: 'json',
       success: function(data) {
+        (document.getElementById('devel-debug-log-messages-table')).innerHTML = '';
         $('#devel-debug-log-messages-table').html(data['content']);
       }
     });
