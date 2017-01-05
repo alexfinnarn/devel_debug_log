@@ -21,15 +21,14 @@ Installation
 
 Documentation
 -------------
-Once the module is enabled, you can use the ddl($message) function in your code to send a debug message.
-
-You can then see the logged messages at "admin/reports/debug".
+Once the module is enabled, you can use the ddl($message) function in your code to 
+send a debug message. You can then see the logged messages at "admin/reports/debug".
 
 Issues
 ------
 
 Bugs and Feature requests should be reported in the Issue Queue:
-https://github.com/backdrop-contrib/devel_debug_log/issues
+https://github.com/backdrop-contrib/devel_debug_log/issues.
 
 Current Maintainers
 -------------------
