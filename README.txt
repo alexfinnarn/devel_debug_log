@@ -1,5 +1,8 @@
 Description
 ===========
+
+This is a port of the 7.x branch of Drupal Devel Debug Log module.
+
 Devel Debug Log is a developer module that provides a way for developers to
 save and display debug messages on a separate page in the web browser. It
 serves as an alternative to using drupal_set_message() or watchdog() for

@@ -61,7 +61,7 @@ function ddl($message, $title = '') {
  *   - object or array: saved serialized.
  */
 function ddl_once($message, $title = '') {
-  $message_history = &drupal_static(__FUNCTION__);
+  $message_history = &backdrop_static(__FUNCTION__);
 
   if (!isset($message_history)) {
     $message_history = array();
@@ -85,13 +85,11 @@ function ddl_once($message, $title = '') {
 function devel_debug_log_page() {
   // Add auto-refresh javascript on the first page only.
   if (!isset($_GET['page'])) {
-    drupal_add_js(array('devel_debug_log' => array('log_refresh_frequency' => variable_get('devel_debug_refresh_frequency', 5))), 'setting');
-    drupal_add_js(drupal_get_path('module', 'devel_debug_log') . '/devel_debug_log.js');
+    backdrop_add_js(backdrop_get_path('module', 'devel_debug_log') . '/js/devel_debug_log.js');
   }
 
   $table_page = array(
-    'devel_debug_log_clear_log_form' => drupal_get_form('devel_debug_log_clear_log_form'),
-    'devel_debug_log_refresh_frequency_form' => drupal_get_form('devel_debug_log_refresh_frequency_form'),
+    'devel_debug_log_clear_log_form' => backdrop_get_form('devel_debug_log_clear_log_form'),
     'messages_table' => devel_debug_log_get_messages_table(),
     'pager' => array(
       '#theme' => 'pager',
@@ -107,10 +105,10 @@ function devel_debug_log_page() {
 function devel_debug_log_callback() {
   $message_table = devel_debug_log_get_messages_table();
   $data = array(
-    'content' => drupal_render($message_table),
+    'content' => backdrop_render($message_table),
   );
 
-  drupal_json_output($data);
+  backdrop_json_output($data);
 }
 
 /**
@@ -141,30 +139,9 @@ function devel_debug_log_clear_log_form($form) {
  */
 function devel_debug_log_clear_log_submit() {
   db_delete('devel_debug_log')->execute();
-  drupal_set_message(t('Database debug log cleared.'));
+  backdrop_set_message(t('Database debug log cleared.'));
 }
 
-/**
- * Return form for Refresh Frequency.
- *
- * @ingroup forms
- */
-function devel_debug_log_refresh_frequency_form($form) {
-  $form['devel_debug_refresh_frequency'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Refreshing frequency'),
-    '#description' => t('This will allow you to alter the Refresh Frequency on the reports page.'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['devel_debug_refresh_frequency']['devel_debug_refresh_frequency'] = array(
-    '#title' => t('Refreshing frequency in seconds'),
-    '#type' => 'textfield',
-    '#default_value' => variable_get('devel_debug_refresh_frequency', 5),
-  );
-
-  return system_settings_form($form);
-}
 
 /**
  * Helper function to return the debug messages table.
