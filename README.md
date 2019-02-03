@@ -33,11 +33,12 @@ https://github.com/backdrop-contrib/devel_debug_log/issues.
 Current Maintainers
 -------------------
 
-- Alex Finnarn [https://github.com/alexfinnarn](https://github.com/alexfinnarn)
+- Seeking maintainers
 
 Credits
 -------
 
+- Ported to Backdrop by [Alex Finnarn](https://github.com/alexfinnarn)
 - Current Drupal module maintainer: [Gergely Lekli](https://www.drupal.org/u/gergely-lekli)
 
 License
